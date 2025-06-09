@@ -50,6 +50,20 @@ export default function TabLayout() {
             ),
           }}
         />
+
+        <Tabs.Screen
+          name="consulta"
+          options={{
+            title: 'Consultas',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? 'clipboard-sharp' : 'clipboard-outline'}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
       </Tabs>
       <Toast /> 
     </View>

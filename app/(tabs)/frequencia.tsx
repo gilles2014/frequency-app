@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message';
 
 /* ───────── Types ───────── */
 type Presenca = 'P' | 'F' | 'FJ';
+
 interface Student {
   id: string;
   name: string;
@@ -160,8 +161,8 @@ const carregarTurmas = async (forcarAtualizacao = false) => {
 
   try {
     const response = await fetch(
-      //'https://script.google.com/macros/s/AKfycbxVwCWmJLDW1GEWFmAEqLxImH8M8M5ILTApTPPMCqcalD-eOcNiGpM51AbdgeVAxZAm_g/exec', //gestão
-      'https://script.google.com/macros/s/AKfycbzWZUt8pju_Xs5_VEsgBx1rXfmvaFCxbSzjJrPeN3rzpRXCVj_b0T0Q0y1Z-ANwL_HARQ/exec', //professor
+      'https://script.google.com/macros/s/AKfycbxVwCWmJLDW1GEWFmAEqLxImH8M8M5ILTApTPPMCqcalD-eOcNiGpM51AbdgeVAxZAm_g/exec', //gestão
+      //'https://script.google.com/macros/s/AKfycbzWZUt8pju_Xs5_VEsgBx1rXfmvaFCxbSzjJrPeN3rzpRXCVj_b0T0Q0y1Z-ANwL_HARQ/exec', //professor
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,6 +180,8 @@ const carregarTurmas = async (forcarAtualizacao = false) => {
           data: formatDate(selectedDate),
           ano: anoSelecionado,
           turma: turmaSelecionada,
+          totalPresentes: totalPresentes,
+          totalFaltas: totalFaltas,
         })
       );
 

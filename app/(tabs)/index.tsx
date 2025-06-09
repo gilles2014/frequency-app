@@ -1,8 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
+      <Image source={require('../../assets/logo-frequencia.png')} style={styles.icon} />
+
       <Text style={styles.title}>Bem-vindo ao App de Registro de Presença!</Text>
       <Text style={styles.subtitle}>Navegue pelas abas abaixo para acessar as funcionalidades.</Text>
     </View>
@@ -29,4 +31,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#003B73', // azul escuro para manter consistência
   },
+  icon: { 
+    width: 100, 
+    height: 100, 
+    borderRadius: 50, 
+    alignSelf: 'center', 
+    marginBottom: 16 },
 });
