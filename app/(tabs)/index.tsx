@@ -34,7 +34,8 @@ const styles = StyleSheet.create({
   icon: { 
     width: 100, 
     height: 100, 
-    borderRadius: 50, 
+    borderRadius: '50%', // para deixar a imagem circular
     alignSelf: 'center', 
-    marginBottom: 16 },
+    marginBottom: 16 
+  },
 });
