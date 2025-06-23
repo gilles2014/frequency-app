@@ -123,33 +123,50 @@ const carregarTurmas = async (forcarAtualizacao = false) => {
   /* helpers */
   const formatDate = (d: Date) => d.toLocaleDateString('pt-BR');
 
-  
-  const handleRegistrar = async () => {
+  const chaveRegistro = `registro_${formatDate(selectedDate)}_${anoSelecionado}_${turmaSelecionada}`;
+
+// --- FUNÇÃO PARA REGISTRAR NOVA FREQUÊNCIA ---
+const handleRegistrar = async () => {
   if (!anoSelecionado || !turmaSelecionada) {
-    alert('Selecione o ano e a turma antes de registrar.');
+    Toast.show({
+      type: 'info',
+      text1: 'Atenção',
+      text2: 'Selecione o ano e a turma antes de registrar.',
+      position: 'top',
+    });
     return;
   }
-
-  const chaveRegistro = `registro_${formatDate(selectedDate)}_${anoSelecionado}_${turmaSelecionada}`;
 
   try {
     const registroExistente = await AsyncStorage.getItem(chaveRegistro);
     if (registroExistente) {
-      alert(`Esta turma já foi registrada na data ${formatDate(selectedDate)}.`);
+      Toast.show({
+        type: 'info',
+        text1: 'Registro Existente',
+        text2: `Esta turma já foi registrada na data ${formatDate(selectedDate)}.`,
+        position: 'top',
+      });
       return;
     }
   } catch (err) {
     console.error('Erro ao verificar registro anterior:', err);
-    alert('Erro ao verificar registro anterior.');
+    Toast.show({
+      type: 'error',
+      text1: 'Erro',
+      text2: 'Erro ao verificar registro anterior.',
+      position: 'top',
+    });
     return;
   }
 
-  setIsSaving(true); // começa o loading
+  setIsSaving(true); // Inicia o indicador de carregamento/salvamento
 
   const totalPresentes = students.filter((aluno) => aluno.presence === 'P').length;
   const totalFaltas = students.length - totalPresentes;
 
-  const payload = {
+  // Payload para enviar para o Google Apps Script (SEM 'action')
+  const payloadParaAPI = {
+    chaveRegistro: chaveRegistro,
     date: formatDate(selectedDate),
     ano: anoSelecionado,
     turma: turmaSelecionada,
@@ -161,25 +178,22 @@ const carregarTurmas = async (forcarAtualizacao = false) => {
 
   try {
     const response = await fetch(
-      'https://script.google.com/macros/s/AKfycbxVwCWmJLDW1GEWFmAEqLxImH8M8M5ILTApTPPMCqcalD-eOcNiGpM51AbdgeVAxZAm_g/exec', //gestão
-      //'https://script.google.com/macros/s/AKfycbzWZUt8pju_Xs5_VEsgBx1rXfmvaFCxbSzjJrPeN3rzpRXCVj_b0T0Q0y1Z-ANwL_HARQ/exec', //professor
+      'https://script.google.com/macros/s/AKfycbyfTJUtqo0FTOLFSfIqddx1VR0F-lsyElN84I0GoY3rxMM6AOUAMS0pMgLcb3rwTuynfA/exec',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payloadParaAPI), // Envia o payload SEM 'action' para a API
       }
     );
 
     const text = await response.text();
-    if (text === 'OK') {
-      // ✅ Salvar marcação no AsyncStorage
+    if (text.startsWith('OK')) { // Usa startsWith para lidar com "OK - Dados salvos."
+      // Salva marcação no AsyncStorage para controle local (também sem 'action')
       await AsyncStorage.setItem(
         chaveRegistro,
         JSON.stringify({
+          ...payloadParaAPI, // Inclui todos os dados do payload enviado para a API
           registrado: true,
-          data: formatDate(selectedDate),
-          ano: anoSelecionado,
-          turma: turmaSelecionada,
           totalPresentes: totalPresentes,
           totalFaltas: totalFaltas,
         })
@@ -192,16 +206,88 @@ const carregarTurmas = async (forcarAtualizacao = false) => {
         position: 'top',
       });
     } else {
-      alert(`Erro ao salvar: ${text}`);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao salvar',
+        text2: text,
+        position: 'top',
+      });
     }
   } catch (err) {
-    alert('Erro ao registrar presença');
+    Toast.show({
+      type: 'error',
+      text1: 'Erro de Conexão',
+      text2: 'Erro ao registrar presença.',
+      position: 'top',
+    });
     console.error(err);
   } finally {
-    setIsSaving(false); // termina o loading
+    setIsSaving(false); // Finaliza o indicador de carregamento/salvamento
   }
 };
 
+// --- NOVA FUNÇÃO PARA EDITAR A PRESENÇA ---
+const handleEditPresence = async (chaveRegistro: String, studentName: String, newPresence: String) => {
+  if (!chaveRegistro || !studentName || !newPresence) {
+    Toast.show({
+      type: 'error',
+      text1: 'Erro',
+      text2: 'Todos os campos são necessários para editar a presença.',
+      position: 'top',
+    });
+    return;
+  }
+
+  setIsSaving(true); // Ativa um indicador de loading para esta operação de edição
+
+  // Payload para edição (SEM 'action', o Apps Script inferirá pela presença de studentName e newPresence)
+  const payloadParaEdicao = {
+    chaveRegistro: chaveRegistro,
+    studentName: studentName,
+    newPresence: newPresence,
+  };
+
+  try {
+    const response = await fetch(
+      'https://script.google.com/macros/s/AKfycbyfTJUtqo0FTOLFSfIqddx1VR0F-lsyElN84I0GoY3rxMM6AOUAMS0pMgLcb3rwTuynfA/exec', 
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadParaEdicao), // Envia o payload SEM 'action' para a API
+      }
+    );
+
+    const text = await response.text();
+    if (text.startsWith('OK')) {
+      Toast.show({
+        type: 'success',
+        text1: 'Presença atualizada!',
+        text2: text,
+        position: 'top',
+      });
+      // Adicione aqui a lógica para atualizar o estado local dos seus alunos,
+      // para que a UI reflita a mudança de presença imediatamente.
+      // Ex: se você tem um estado 'students', você pode mapear e atualizar o aluno específico.
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao atualizar',
+        text2: text,
+        position: 'top',
+      });
+    }
+  } catch (err) {
+    Toast.show({
+      type: 'error',
+      text1: 'Erro de Conexão',
+      text2: 'Erro ao editar presença.',
+      position: 'top',
+    });
+    console.error(err);
+  } finally {
+    setIsSaving(false); // Finaliza o indicador de loading
+  }
+};
 
 
 const flatListRef = useRef<FlatList>(null);

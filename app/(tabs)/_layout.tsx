@@ -33,8 +33,11 @@ export default function TabLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+              <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color='#003B73' />
             ),
+            tabBarLabelStyle: {
+              color: '#003B73', 
+            },
           }}
         />
         <Tabs.Screen
@@ -45,9 +48,12 @@ export default function TabLayout() {
               <Ionicons
                 name={focused ? 'checkmark-circle' : 'checkmark-circle-outline'}
                 size={24}
-                color={color}
+                color='#003B73'
               />
             ),
+            tabBarLabelStyle: {
+              color: '#003B73', 
+            },
           }}
         />
 
@@ -59,9 +65,12 @@ export default function TabLayout() {
               <Ionicons
                 name={focused ? 'clipboard-sharp' : 'clipboard-outline'}
                 size={24}
-                color={color}
+                color='#003B73'
               />
             ),
+            tabBarLabelStyle: {
+              color: '#003B73', 
+            },
           }}
         />
       </Tabs>
