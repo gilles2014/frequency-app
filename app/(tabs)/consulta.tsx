@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -19,6 +20,14 @@ export default function Consulta() {
 
   const formatDate = (d: Date) => d.toLocaleDateString('pt-BR');
 
+  // Carrega registros quando a tela recebe foco
+  useFocusEffect(
+    React.useCallback(() => {
+      carregarRegistros();
+    }, [selectedDate])
+  );
+
+  // Carrega registros quando a data muda
   useEffect(() => {
     carregarRegistros();
   }, [selectedDate]);
@@ -162,7 +171,7 @@ export default function Consulta() {
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={{ flex: 1, backgroundColor: '#eef5ff', padding: 16 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Editar Presença</Text>
+          <Text style={styles.title}>Editar Presença</Text>
 
           <ScrollView>
             {alunosDoRegistro.map((aluno, index) => (
@@ -172,10 +181,10 @@ export default function Consulta() {
                   style={{
                     backgroundColor:
                       aluno.presence === 'P'
-                        ? '#a7f3d0'
+                        ? '#28593F'
                         : aluno.presence === 'F'
-                        ? '#fecaca'
-                        : '#fef9c3',
+                        ? '#A64D4D'
+                        : '#A6994D',
                     borderRadius: 8,
                     borderWidth: 1,
                     borderColor: '#ccc',
@@ -188,10 +197,11 @@ export default function Consulta() {
                       novosAlunos[index].presence = valor;
                       setAlunosDoRegistro(novosAlunos);
                     }}
+                    style={{ color: '#fff' }}
                   >
-                    <Picker.Item label="P - Presente" value="P" />
-                    <Picker.Item label="F - Falta" value="F" />
-                    <Picker.Item label="FJ - Falta Justificada" value="FJ" />
+                    <Picker.Item label="P - Presente" value="P" style={{ fontWeight: 'bold' }} />
+                    <Picker.Item label="F - Falta" value="F" style={{ fontWeight: 'bold' }} />
+                    <Picker.Item label="FJ - Falta Justificada" value="FJ" style={{ fontWeight: 'bold' }} />
                   </Picker>
                 </View>
               </View>
@@ -199,11 +209,13 @@ export default function Consulta() {
           </ScrollView>
 
           <TouchableOpacity style={styles.saveButton} onPress={salvarAlteracoes}>
-            <Text style={{ color: '#fff', textAlign: 'center' }}>Salvar Alterações</Text>
+            <Text style={{ color: '#fff', textAlign: 'center', 
+            fontWeight: 'bold', fontSize: 16, }}>Salvar Alterações</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-            <Text style={{ color: '#003B73', textAlign: 'center' }}>Cancelar</Text>
+            <Text style={{ color: '#003B73', textAlign: 'center',
+              fontWeight: 'bold', fontSize: 16 }}>Cancelar</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -325,7 +337,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 16,
     right: 16,
-    backgroundColor: '#FF5C5C',
+    backgroundColor: '#A64D4D',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
