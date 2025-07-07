@@ -2,7 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -471,6 +473,17 @@ const flatListRef = useRef<FlatList>(null);
         </TouchableOpacity>
       </View>
 
+      {isSaving && (
+        <Modal transparent={true} animationType="fade">
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#003B73" />
+              <Text style={styles.loadingText}>Salvando...</Text>
+            </View>
+          </View>
+        </Modal>
+      )}
+
     </View>
   );
 }
@@ -561,7 +574,7 @@ const styles = StyleSheet.create({
 
 footerBtn: {
   flex: 1,
-  backgroundColor: '#007bff',
+  backgroundColor: '#003B73',
   paddingVertical: 12,
   borderRadius: 12,
   alignItems: 'center',
@@ -573,7 +586,7 @@ footerBtn: {
 },
 
 atualizarBtn: {
-  backgroundColor: '#6c757d',
+  backgroundColor: '#28593F',
   marginLeft: 10,
 },
 
@@ -583,4 +596,24 @@ footerBtnText: {
   fontSize: 16,
 },
   
+loadingOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+loadingContainer: {
+  backgroundColor: '#fff',
+  padding: 20,
+  borderRadius: 10,
+  alignItems: 'center',
+},
+
+loadingText: {
+  marginTop: 10,
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#003B73',
+},
 });
